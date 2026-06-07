@@ -20,7 +20,7 @@
 - [✨ Features](#-features)
 - [🏗️ Tech Stack](#️-tech-stack)
 - [📁 Project Structure](#-project-structure)
-- [🌐 API Endpoints](#-api-endpoints)
+
 
 
 
