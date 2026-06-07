@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker Pro - Build Better Habits</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .landing-hero {
+            text-align: center;
+            padding: 80px 20px;
+            background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+            border-radius: 30px;
+            margin-bottom: 40px;
+        }
+        .landing-hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--accent), var(--success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .landing-hero p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            color: var(--text-secondary);
+        }
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--success));
+            color: white;
+            padding: 14px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(67, 97, 238, 0.3);
+        }
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            padding: 14px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        .btn-secondary:hover {
+            background: var(--accent);
+            color: white;
+        }
+        
+        /* ========== FEATURES GRID - ENHANCED WITH ANIMATIONS ========== */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+        }
+        
+        .feature-card {
+            text-align: center;
+            padding: 30px;
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.1);
+            border-color: var(--accent);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: inline-block;
+            animation: gentleFloat 3s ease infinite;
+        }
+        
+        .feature-card h3 {
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+            color: var(--text-primary);
+        }
+        
+        .feature-card p {
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        
+        /* ========== GLASSY NAVBAR STYLES ========== */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(12px);
+            border-radius: 60px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        body.dark .navbar {
+            background: rgba(30, 30, 50, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Fixed Logo - Emoji visible, text has gradient */
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .logo .logo-emoji {
+            font-size: 1.5rem;
+            background: none;
+            -webkit-text-fill-color: initial;
+        }
+        
+        .logo .logo-text {
+            background: linear-gradient(135deg, var(--accent), var(--success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+        
+        body.dark .nav-links a {
+            color: rgba(255, 255, 255, 0.85);
+        }
+        
+        body.dark .nav-links a:hover {
+            color: var(--accent);
+        }
+        
+        .navbar .btn-secondary {
+            padding: 8px 20px;
+            border-width: 1px;
+        }
+        
+        .navbar .btn-primary {
+            padding: 8px 20px;
+        }
+        
+        .cta-section {
+            text-align: center;
+            margin-top: 60px;
+            padding: 60px;
+            background: linear-gradient(135deg, var(--accent), var(--success));
+            border-radius: 30px;
+            color: white;
+        }
+        .cta-section h2 {
+            margin-bottom: 15px;
+        }
+        .cta-section .btn-primary {
+            background: white;
+            color: var(--accent);
+            margin-top: 20px;
+            display: inline-block;
+        }
+
+        /* ========== HOW IT WORKS SECTION - ENHANCED ========== */
+        .how-it-works-section {
+            text-align: center;
+            margin-top: 60px;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.05), rgba(6, 214, 160, 0.05));
+            border-radius: 40px;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--accent), var(--success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .section-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            font-size: 1rem;
+        }
+        
+        .steps-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        .step-card {
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            padding: 30px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        
+        .step-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.1);
+            border-color: var(--accent);
+        }
+        
+        .step-number {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent), var(--success));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .step-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: inline-block;
+            animation: gentleFloat 3s ease infinite;
+        }
+        
+        @keyframes gentleFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        .step-card h4 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+        
+        .step-card p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        
+        body.dark .feature-card,
+        body.dark .step-card {
+            background: var(--bg-secondary);
+        }
+        
+        body.dark .feature-card:hover,
+        body.dark .step-card:hover {
+            border-color: var(--success);
+        }
+        
+        @media (max-width: 768px) {
+            .landing-hero h1 { font-size: 2rem; }
+            .navbar { flex-direction: column; border-radius: 30px; }
+            .how-it-works-section {
+                padding: 30px 15px;
+            }
+            .section-title {
+                font-size: 1.5rem;
+            }
+            .step-card,
+            .feature-card {
+                padding: 25px 15px;
+            }
+            .step-icon,
+            .feature-icon {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Glassy Navbar with Fixed Logo -->
+        <nav class="navbar">
+            <div class="logo">
+                <span class="logo-emoji">📊</span>
+                <span class="logo-text">Habit Tracker Pro</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="login.html" class="btn-secondary" style="padding: 8px 20px;">Sign In</a>
+                <a href="signup.html" class="btn-primary" style="padding: 8px 20px;">Get Started</a>
+            </div>
+        </nav>
+
+        <div class="landing-hero">
+            <h1>Build Better Habits<br>With AI-Powered Coaching</h1>
+            <p>Track your habits, get personalized insights, and stay motivated with your personal AI habit coach — all for free.</p>
+            <div class="btn-group">
+                <a href="signup.html" class="btn-primary">🚀 Get Started Free</a>
+                <a href="#features" class="btn-secondary">📖 Learn More</a>
+            </div>
+        </div>
+
+        <!-- Enhanced Features Grid with Animations -->
+        <div class="features-grid" id="features">
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Habit Tracking</h3>
+                <p>Track daily habits, monitor streaks, and visualize your progress with beautiful charts.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3>AI Habit Coach</h3>
+                <p>Get personalized motivation, habit suggestions, and science-backed explanations.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Advanced Analytics</h3>
+                <p>Understand your patterns with weekly reports, success rates, and smart insights.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔔</div>
+                <h3>Smart Reminders</h3>
+                <p>Never miss a habit with daily reminders and streak protection.</p>
+            </div>
+        </div>
+
+        <!-- Enhanced How It Works Section -->
+        <div class="how-it-works-section" id="how-it-works">
+            <h2 class="section-title">📋 How It Works</h2>
+            <p class="section-subtitle">Your path to better habits in 4 simple steps</p>
+            <div class="steps-container">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">🎯</div>
+                    <h4>Start Your Journey</h4>
+                    <p>Create your free account in under 30 seconds — no credit card required</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">✨</div>
+                    <h4>Build Your Stack</h4>
+                    <p>Add habits you want to master — Exercise, Read, Meditate, or customize your own</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">🤖</div>
+                    <h4>AI Powered</h4>
+                    <p>Get personalized motivation, habit suggestions, and science-backed insights daily</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <div class="step-icon">📈</div>
+                    <h4>Watch Yourself Grow</h4>
+                    <p>Track streaks, celebrate milestones, and see your transformation with beautiful charts</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="cta-section">
+            <h2>Ready to Transform Your Habits?</h2>
+            <p>Join thousands of users building better habits every day.</p>
+            <a href="signup.html" class="btn-primary">Start Your Journey →</a>
+        </div>
+    </div>
+</body>
+</html>

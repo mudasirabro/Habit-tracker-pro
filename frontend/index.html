@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker Pro 📊</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="theme-toggle" id="themeToggle">🌙</button>
+       <div class="container">
+    <div style="display: flex; justify-content: flex-start; margin-bottom: 20px;">
+        <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+    </div>
+        <div class="header">
+         <h1><span class="gradient-text">Habit Tracker Pro</span> 📊</h1>
+            <p>Build better habits, one day at a time</p>
+        </div>
+        
+        <div class="dashboard-grid">
+            <div class="card">
+                <h2>➕ My Habits</h2>
+                <div class="add-habit-form">
+                    <input type="text" id="habitName" placeholder="e.g., Exercise, Read, Meditate..." />
+                    <button id="addHabitBtn">Add Habit</button>
+                </div>
+                <div id="habitsList" class="habits-list"></div>
+            </div>
+            
+            <div class="card">
+                <h2>📈 Dashboard</h2>
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-value" id="totalHabits">0</div><div class="stat-label">Total Habits</div></div>
+                    <div class="stat-card"><div class="stat-value" id="totalCompletions">0</div><div class="stat-label">Total Completions</div></div>
+                    <div class="stat-card"><div class="stat-value" id="todayProgress">0/0</div><div class="stat-label">Today's Progress</div></div>
+                    <div class="stat-card"><div class="stat-value" id="bestStreak">0</div><div class="stat-label">🔥 Best Streak</div></div>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" id="progressFill">0%</div></div>
+                <div style="margin-top: 25px;"><h3 style="margin-bottom: 15px;">📊 Weekly Progress</h3><div style="height: 250px;"><canvas id="completionChart"></canvas></div></div>
+                <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid var(--border);">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="reminderToggle" style="width: 18px; height: 18px;">
+                        <span>🔔 Enable daily reminder (8 PM)</span>
+                    </label>
+                </div>
+                <button class="export-btn" id="exportBtn" style="margin-top: 15px;">💾 Export Data (JSON)</button>
+                <button class="export-btn" id="exportPDFBtn" style="margin-top: 10px; background: linear-gradient(135deg, #ef476f, #c1121f);">📄 Export as PDF</button>
+            </div>
+        </div>
+        
+        <!-- AI Coach Section -->
+        <div class="card coach-card">
+            <div class="coach-header">
+                <div class="coach-avatar">🤖</div>
+                <div class="coach-title">
+                    <h2>AI Habit Coach</h2>
+                    <p>Your personal habit assistant, ready to help 24/7</p>
+                </div>
+            </div>
+            <div id="coachMessages" class="coach-chat-container">
+                <div class="coach-welcome">
+                    <div class="coach-welcome-emoji">🧠✨</div>
+                    <h3>Hi there! I'm your AI Habit Coach</h3>
+                    <p>Ask me anything about building better habits, staying motivated, or getting back on track.</p>
+                </div>
+            </div>
+            <div class="coach-input-area">
+                <input type="text" id="coachInput" placeholder="Ask me anything about habits... 💬" />
+                <button id="sendCoachBtn">📤 Send</button>
+            </div>
+            <div class="coach-quick-actions">
+                <button class="coach-quick-btn" data-type="motivation">🔥 Motivation</button>
+                <button class="coach-quick-btn" data-type="suggestion">💡 Habit Idea</button>
+                <button class="coach-quick-btn" data-type="explain">📚 Why It Works</button>
+                <button class="coach-quick-btn" data-type="recovery">🔄 Get Back on Track</button>
+            </div>
+        </div>
+        
+        <!-- Calendar Section -->
+        <div class="card">
+            <h2>📅 Activity Calendar</h2>
+            <div class="calendar">
+                <div class="calendar-header">
+                    <button class="calendar-nav" id="prevMonth">◀</button>
+                    <span id="currentMonth"></span>
+                    <button class="calendar-nav" id="nextMonth">▶</button>
+                </div>
+                <div class="calendar-grid" id="calendarGrid"></div>
+            </div>
+            <p style="text-align: center; margin-top: 15px; color: var(--text-secondary); font-size: 0.85rem;">💡 Click on any day to see details</p>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
