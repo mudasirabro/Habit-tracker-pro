@@ -9,7 +9,7 @@
 
 **Build better habits, one day at a time**
 
-[Live Demo](https://habit-tracker-pro.vercel.app) | [Report Bug](https://github.com/YOUR_USERNAME/habit-tracker-pro/issues) | [Request Feature](https://github.com/YOUR_USERNAME/habit-tracker-pro/issues)
+
 
 </div>
 
@@ -20,12 +20,9 @@
 - [✨ Features](#-features)
 - [🏗️ Tech Stack](#️-tech-stack)
 - [📁 Project Structure](#-project-structure)
-- [🚀 Getting Started](#-getting-started)
-- [🔧 Installation](#-installation)
 - [🌐 API Endpoints](#-api-endpoints)
-- [📄 Deployment](#-deployment)
-- [🤝 Contributing](#-contributing)
-- [📝 License](#-license)
+
+
 
 ---
 
