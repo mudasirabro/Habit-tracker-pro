@@ -6,6 +6,10 @@
       "destination": "/api"
     },
     {
+      "source": "/",
+      "destination": "/frontend/landing.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/frontend/$1"
     }

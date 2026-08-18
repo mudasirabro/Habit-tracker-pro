@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Habit Tracker Pro 📊</title>
+    <script>
+        // Immediate blocking check before any HTML renders to eliminate flash of dashboard
+        if (!localStorage.getItem('token')) {
+            window.location.replace('landing.html');
+        }
+    </script>
+    <style>
+        /* Hidden by default until token is validated */
+        html { visibility: hidden; opacity: 0; }
+    </style>
+    <script>
+        if (localStorage.getItem('token')) {
+            document.documentElement.style.visibility = 'visible';
+            document.documentElement.style.opacity = '1';
+        }
+    </script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>

@@ -7,7 +7,7 @@ function checkAuth() {
     
     if (!token) {
         console.log('❌ No token found, redirecting to landing.html');
-        window.location.href = 'landing.html';
+        window.location.replace('landing.html');
         return false;
     }
     return true;
@@ -36,7 +36,7 @@ if (isProtectedPage) {
     
     if (!token) {
         console.log('🚫 No token, redirecting to landing');
-        window.location.href = 'landing.html';
+        window.location.replace('landing.html');
     } else {
         console.log('✅ Authenticated, loading app');
     }
@@ -46,7 +46,7 @@ function logout() {
     console.log('🚪 Logging out');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    window.location.href = 'landing.html';
+    window.location.replace('landing.html');
 }
 
 // Display user info
