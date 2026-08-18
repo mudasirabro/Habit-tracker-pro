@@ -17,8 +17,11 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Root and Health endpoints for Render and status checks
-app.get('/', (req, res) => {
+// Create Router for all API routes (mounted at both /api and / for Vercel Serverless compatibility)
+const router = express.Router();
+
+// Root and Health status
+router.get('/', (req, res) => {
   res.json({
     status: 'ok',
     service: 'Habit Tracker Pro API',
@@ -27,68 +30,79 @@ app.get('/', (req, res) => {
   });
 });
 
-app.get('/health', (req, res) => {
+router.get('/health', (req, res) => {
   res.status(200).json({ status: 'healthy', uptime: process.uptime() });
 });
 
-// Initialize database
-initDb();
-
-console.log('✅ Server starting...');
-console.log('API Key present:', !!process.env.HABITAI_API_KEY);
-console.log('Database URL configured:', !!process.env.DATABASE_URL);
+router.get('/test', (req, res) => {
+  res.json({ message: 'Server is running!' });
+});
 
 // ========== AUTH ROUTES ==========
 
-app.post('/api/auth/register', async (req, res) => {
-  const { username, email, password } = req.body;
-  const result = await registerUser(username, email, password);
-  
-  if (result.success) {
-    res.json(result);
-  } else {
-    res.status(400).json({ error: result.error });
+router.post('/auth/register', async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+    const result = await registerUser(username, email, password);
+    
+    if (result.success) {
+      res.json(result);
+    } else {
+      res.status(400).json({ error: result.error });
+    }
+  } catch (err) {
+    console.error('Register error:', err);
+    res.status(500).json({ error: err.message || 'Internal server error' });
   }
 });
 
-app.post('/api/auth/login', async (req, res) => {
-  const { email, password } = req.body;
-  const result = await loginUser(email, password);
-  
-  if (result.success) {
-    res.json(result);
-  } else {
-    res.status(401).json({ error: result.error });
+router.post('/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const result = await loginUser(email, password);
+    
+    if (result.success) {
+      res.json(result);
+    } else {
+      res.status(401).json({ error: result.error });
+    }
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ error: err.message || 'Internal server error' });
   }
 });
 
-app.get('/api/auth/verify', async (req, res) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) {
-    return res.status(401).json({ error: 'No token' });
-  }
-  
-  const user = await getUserFromToken(token);
-  if (user) {
-    res.json({ valid: true, user });
-  } else {
-    res.status(401).json({ valid: false });
+router.get('/auth/verify', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ error: 'No token' });
+    }
+    
+    const user = await getUserFromToken(token);
+    if (user) {
+      res.json({ valid: true, user });
+    } else {
+      res.status(401).json({ valid: false });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message || 'Verification error' });
   }
 });
 
 // ========== PROTECTED HABIT ROUTES ==========
 
-app.get('/api/habits', verifyToken, async (req, res) => {
+router.get('/habits', verifyToken, async (req, res) => {
   try {
     const habits = await getHabits(req.userId);
     res.json(habits);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Database error' });
+    console.error('getHabits error:', error);
+    res.status(500).json({ error: error.message || 'Database error' });
   }
 });
 
-app.post('/api/habits', verifyToken, async (req, res) => {
+router.post('/habits', verifyToken, async (req, res) => {
   const { name } = req.body;
   if (!name) {
     return res.status(400).json({ error: 'Habit name required' });
@@ -97,12 +111,12 @@ app.post('/api/habits', verifyToken, async (req, res) => {
     const newHabit = await addHabit(req.userId, name);
     res.json(newHabit);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to add habit' });
+    console.error('addHabit error:', error);
+    res.status(500).json({ error: error.message || 'Failed to add habit' });
   }
 });
 
-app.put('/api/habits/:habitId', verifyToken, async (req, res) => {
+router.put('/habits/:habitId', verifyToken, async (req, res) => {
   const { habitId } = req.params;
   const { name } = req.body;
   
@@ -118,12 +132,12 @@ app.put('/api/habits/:habitId', verifyToken, async (req, res) => {
       res.status(404).json({ error: 'Habit not found' });
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to update habit' });
+    console.error('updateHabit error:', error);
+    res.status(500).json({ error: error.message || 'Failed to update habit' });
   }
 });
 
-app.delete('/api/habits/:habitId', verifyToken, async (req, res) => {
+router.delete('/habits/:habitId', verifyToken, async (req, res) => {
   const { habitId } = req.params;
   
   try {
@@ -134,40 +148,36 @@ app.delete('/api/habits/:habitId', verifyToken, async (req, res) => {
       res.status(404).json({ error: 'Habit not found' });
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to delete habit' });
+    console.error('deleteHabit error:', error);
+    res.status(500).json({ error: error.message || 'Failed to delete habit' });
   }
 });
 
-app.post('/api/habits/:habitId/toggle', verifyToken, async (req, res) => {
+router.post('/habits/:habitId/toggle', verifyToken, async (req, res) => {
   const { habitId } = req.params;
   const { date, completed } = req.body;
   try {
     const result = await toggleHabitEntry(req.userId, parseInt(habitId), date, completed);
     res.json(result);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to toggle habit' });
+    console.error('toggleHabitEntry error:', error);
+    res.status(500).json({ error: error.message || 'Failed to toggle habit' });
   }
 });
 
-app.get('/api/entries', verifyToken, async (req, res) => {
+router.get('/entries', verifyToken, async (req, res) => {
   try {
     const entries = await getHabitEntries(req.userId);
     res.json(entries);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Database error' });
+    console.error('getHabitEntries error:', error);
+    res.status(500).json({ error: error.message || 'Database error' });
   }
 });
 
-// ========== AI COACH ROUTES (Protected) ==========
+// ========== AI COACH ROUTES ==========
 
-app.get('/api/test', (req, res) => {
-  res.json({ message: 'Server is running!' });
-});
-
-app.post('/api/coach/mindfulness', verifyToken, async (req, res) => {
+router.post('/coach/mindfulness', verifyToken, async (req, res) => {
   try {
     const { userMessage } = req.body;
     const apiKey = process.env.HABITAI_API_KEY;
@@ -198,7 +208,7 @@ app.post('/api/coach/mindfulness', verifyToken, async (req, res) => {
   }
 });
 
-app.post('/api/coach/eating', verifyToken, async (req, res) => {
+router.post('/coach/eating', verifyToken, async (req, res) => {
   try {
     const { goal } = req.body;
     const apiKey = process.env.HABITAI_API_KEY;
@@ -228,7 +238,7 @@ app.post('/api/coach/eating', verifyToken, async (req, res) => {
   }
 });
 
-app.post('/api/coach/meditation', verifyToken, async (req, res) => {
+router.post('/coach/meditation', verifyToken, async (req, res) => {
   try {
     const { question } = req.body;
     const apiKey = process.env.HABITAI_API_KEY;
@@ -257,6 +267,13 @@ app.post('/api/coach/meditation', verifyToken, async (req, res) => {
     res.json({ success: true, response: "🧘 Breathe in for 4 seconds, hold for 4, exhale for 4. Do this daily." });
   }
 });
+
+// Mount router on both '/api' and '/' to ensure total compatibility with Vercel rewrites
+app.use('/api', router);
+app.use('/', router);
+
+// Trigger background table initialization
+initDb().catch(err => console.error('Database startup init warning:', err.message));
 
 if (require.main === module || !process.env.VERCEL) {
   app.listen(PORT, () => {
