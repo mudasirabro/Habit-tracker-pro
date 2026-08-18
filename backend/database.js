@@ -69,6 +69,12 @@ async function initDb() {
       );
     `);
 
+    // Performance indexes
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_habits_user ON habits(user_id);
+      CREATE INDEX IF NOT EXISTS idx_habit_entries_user_date ON habit_entries(user_id, date);
+    `);
+
     await client.query('COMMIT');
     dbInitialized = true;
     console.log('✅ PostgreSQL database tables initialized successfully');
