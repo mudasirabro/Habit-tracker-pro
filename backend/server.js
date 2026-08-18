@@ -256,8 +256,12 @@ app.post('/api/coach/meditation', verifyToken, async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`\n✅ Backend running at http://localhost:${PORT}`);
-  console.log(`✅ Auth endpoints: /api/auth/register, /api/auth/login`);
-  console.log(`✅ Protected habit endpoints ready`);
-});
+if (require.main === module || !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`\n✅ Backend running at http://localhost:${PORT}`);
+    console.log(`✅ Auth endpoints: /api/auth/register, /api/auth/login`);
+    console.log(`✅ Protected habit endpoints ready`);
+  });
+}
+
+module.exports = app;
