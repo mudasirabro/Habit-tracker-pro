@@ -3,7 +3,6 @@
 <div align="center">
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
 ![Node](https://img.shields.io/badge/node-18+-green)
 ![Database](https://img.shields.io/badge/database-SQLite%20%7C%20PostgreSQL-blue)
 
