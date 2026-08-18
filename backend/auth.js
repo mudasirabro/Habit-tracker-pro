@@ -66,7 +66,7 @@ async function registerUser(username, email, password) {
     };
   } catch (error) {
     console.error('Register error:', error);
-    if (error.message && error.message.includes('UNIQUE')) {
+    if (error.code === '23505' || (error.message && (error.message.includes('UNIQUE') || error.message.includes('duplicate key')))) {
       return { success: false, error: 'Username or email already exists' };
     }
     return { success: false, error: 'Server error' };

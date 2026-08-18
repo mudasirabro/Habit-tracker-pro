@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: habit-tracker-backend
+    env: node
+    plan: free
+    region: singapore # Options: singapore, frankfurt, oregon, ohio
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false # Set to your Neon.tech connection string in Render Dashboard
+      - key: HABITAI_API_KEY
+        sync: false # Set to your AI Coach API key

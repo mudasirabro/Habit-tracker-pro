@@ -8,14 +8,33 @@ const { loginUser, registerUser, verifyToken, getUserFromToken } = require('./au
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
+
+// Root and Health endpoints for Render and status checks
+app.get('/', (req, res) => {
+  res.json({
+    status: 'ok',
+    service: 'Habit Tracker Pro API',
+    database: 'PostgreSQL (Neon.tech)',
+    timestamp: new Date().toISOString()
+  });
+});
+
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'healthy', uptime: process.uptime() });
+});
 
 // Initialize database
 initDb();
 
 console.log('✅ Server starting...');
 console.log('API Key present:', !!process.env.HABITAI_API_KEY);
+console.log('Database URL configured:', !!process.env.DATABASE_URL);
 
 // ========== AUTH ROUTES ==========
 

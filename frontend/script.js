@@ -1,5 +1,5 @@
 // ========== AUTHENTICATION ==========
-const API_URL = 'http://localhost:3000/api';
+const API_URL = window.API_URL || 'http://localhost:3000/api';
 
 function checkAuth() {
     const token = localStorage.getItem('token');
@@ -933,7 +933,7 @@ async function askAICoach(userMessage) {
     coachContainer.appendChild(typingDiv);
     coachContainer.scrollTop = coachContainer.scrollHeight;
     try {
-        const response = await fetch('http://localhost:3000/api/coach/mindfulness', {
+        const response = await fetch(`${API_URL}/coach/mindfulness`, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userMessage })
         });
