@@ -69,10 +69,23 @@ async function initDb() {
       );
     `);
 
+    // Tasks table (Daily Task Management with Priority)
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS tasks (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        title VARCHAR(255) NOT NULL,
+        priority VARCHAR(20) DEFAULT 'medium',
+        completed INTEGER DEFAULT 0,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
     // Performance indexes
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_habits_user ON habits(user_id);
       CREATE INDEX IF NOT EXISTS idx_habit_entries_user_date ON habit_entries(user_id, date);
+      CREATE INDEX IF NOT EXISTS idx_tasks_user ON tasks(user_id);
     `);
 
     await client.query('COMMIT');
@@ -224,6 +237,56 @@ async function getHabitEntries(userId) {
   return result.rows || [];
 }
 
+// ========== DAILY TASK MANAGEMENT ==========
+
+async function getTasks(userId) {
+  await ensureDb();
+  const result = await pool.query(
+    'SELECT * FROM tasks WHERE user_id = $1 ORDER BY completed ASC, CASE priority WHEN \'high\' THEN 1 WHEN \'medium\' THEN 2 WHEN \'low\' THEN 3 ELSE 4 END, created_at DESC',
+    [userId]
+  );
+  return result.rows || [];
+}
+
+async function addTask(userId, title, priority = 'medium') {
+  await ensureDb();
+  const validPriority = ['high', 'medium', 'low'].includes(priority) ? priority : 'medium';
+  const result = await pool.query(
+    'INSERT INTO tasks (user_id, title, priority, completed) VALUES ($1, $2, $3, 0) RETURNING *',
+    [userId, title, validPriority]
+  );
+  return result.rows[0];
+}
+
+async function updateTask(userId, taskId, title, priority) {
+  await ensureDb();
+  const validPriority = ['high', 'medium', 'low'].includes(priority) ? priority : 'medium';
+  const result = await pool.query(
+    'UPDATE tasks SET title = $1, priority = $2 WHERE id = $3 AND user_id = $4 RETURNING *',
+    [title, validPriority, taskId, userId]
+  );
+  return result.rows[0] || null;
+}
+
+async function deleteTask(userId, taskId) {
+  await ensureDb();
+  const result = await pool.query(
+    'DELETE FROM tasks WHERE id = $1 AND user_id = $2',
+    [taskId, userId]
+  );
+  return (result.rowCount || 0) > 0;
+}
+
+async function toggleTask(userId, taskId, completed) {
+  await ensureDb();
+  const completedVal = completed ? 1 : 0;
+  const result = await pool.query(
+    'UPDATE tasks SET completed = $1 WHERE id = $2 AND user_id = $3 RETURNING *',
+    [completedVal, taskId, userId]
+  );
+  return result.rows[0] || null;
+}
+
 module.exports = {
   pool,
   initDb,
@@ -238,5 +301,10 @@ module.exports = {
   updateHabit,
   deleteHabit,
   toggleHabitEntry,
-  getHabitEntries
+  getHabitEntries,
+  getTasks,
+  addTask,
+  updateTask,
+  deleteTask,
+  toggleTask
 };

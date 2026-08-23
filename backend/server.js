@@ -4,7 +4,20 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
-const { initDb, getHabits, addHabit, updateHabit, deleteHabit, toggleHabitEntry, getHabitEntries } = require('./database');
+const { 
+  initDb, 
+  getHabits, 
+  addHabit, 
+  updateHabit, 
+  deleteHabit, 
+  toggleHabitEntry, 
+  getHabitEntries,
+  getTasks,
+  addTask,
+  updateTask,
+  deleteTask,
+  toggleTask
+} = require('./database');
 const { loginUser, registerUser, verifyToken, getUserFromToken } = require('./auth');
 
 const app = express();
@@ -172,6 +185,82 @@ router.get('/entries', verifyToken, async (req, res) => {
   } catch (error) {
     console.error('getHabitEntries error:', error);
     res.status(500).json({ error: error.message || 'Database error' });
+  }
+});
+
+// ========== DAILY TASK ROUTES (Protected) ==========
+
+router.get('/tasks', verifyToken, async (req, res) => {
+  try {
+    const tasks = await getTasks(req.userId);
+    res.json(tasks);
+  } catch (error) {
+    console.error('getTasks error:', error);
+    res.status(500).json({ error: error.message || 'Database error' });
+  }
+});
+
+router.post('/tasks', verifyToken, async (req, res) => {
+  const { title, priority } = req.body;
+  if (!title || !title.trim()) {
+    return res.status(400).json({ error: 'Task title is required' });
+  }
+  try {
+    const newTask = await addTask(req.userId, title.trim(), priority);
+    res.status(201).json(newTask);
+  } catch (error) {
+    console.error('addTask error:', error);
+    res.status(500).json({ error: error.message || 'Failed to add task' });
+  }
+});
+
+router.put('/tasks/:taskId', verifyToken, async (req, res) => {
+  const { taskId } = req.params;
+  const { title, priority } = req.body;
+  if (!title || !title.trim()) {
+    return res.status(400).json({ error: 'Task title is required' });
+  }
+  try {
+    const updated = await updateTask(req.userId, parseInt(taskId), title.trim(), priority);
+    if (updated) {
+      res.json(updated);
+    } else {
+      res.status(404).json({ error: 'Task not found' });
+    }
+  } catch (error) {
+    console.error('updateTask error:', error);
+    res.status(500).json({ error: error.message || 'Failed to update task' });
+  }
+});
+
+router.delete('/tasks/:taskId', verifyToken, async (req, res) => {
+  const { taskId } = req.params;
+  try {
+    const deleted = await deleteTask(req.userId, parseInt(taskId));
+    if (deleted) {
+      res.json({ message: 'Task deleted successfully' });
+    } else {
+      res.status(404).json({ error: 'Task not found' });
+    }
+  } catch (error) {
+    console.error('deleteTask error:', error);
+    res.status(500).json({ error: error.message || 'Failed to delete task' });
+  }
+});
+
+router.post('/tasks/:taskId/toggle', verifyToken, async (req, res) => {
+  const { taskId } = req.params;
+  const { completed } = req.body;
+  try {
+    const updated = await toggleTask(req.userId, parseInt(taskId), completed);
+    if (updated) {
+      res.json(updated);
+    } else {
+      res.status(404).json({ error: 'Task not found' });
+    }
+  } catch (error) {
+    console.error('toggleTask error:', error);
+    res.status(500).json({ error: error.message || 'Failed to toggle task' });
   }
 });
 

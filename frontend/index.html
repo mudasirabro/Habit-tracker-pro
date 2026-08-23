@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Habit Tracker Pro 📊</title>
+    <title>Habit Tracker Pro 📊 — Focus & Task Master</title>
     <script>
         // Immediate blocking check before any HTML renders to eliminate flash of dashboard
         if (!localStorage.getItem('token')) {
@@ -23,90 +23,467 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <button class="theme-toggle" id="themeToggle">🌙</button>
-       <div class="container">
-    <div style="display: flex; justify-content: flex-start; margin-bottom: 20px;">
-        <button class="logout-btn" onclick="logout()">🚪 Logout</button>
-    </div>
-        <div class="header">
-         <h1><span class="gradient-text">Habit Tracker Pro</span> 📊</h1>
-            <p>Build better habits, one day at a time</p>
-        </div>
-        
-        <div class="dashboard-grid">
-            <div class="card">
-                <h2>➕ My Habits</h2>
-                <div class="add-habit-form">
-                    <input type="text" id="habitName" placeholder="e.g., Exercise, Read, Meditate..." />
-                    <button id="addHabitBtn">Add Habit</button>
+    <!-- Confetti Canvas for Victory Celebrations -->
+    <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
+
+    <!-- App Container -->
+    <div class="app-container">
+        <!-- Top App Navigation Bar -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="brand-logo">
+                    <span class="logo-icon">📊</span>
+                    <span class="logo-text gradient-text">Habit Tracker Pro</span>
                 </div>
-                <div id="habitsList" class="habits-list"></div>
+                <span class="user-greeting" id="userGreeting">Welcome back!</span>
             </div>
+            <div class="header-actions">
+                <!-- Focus Shield / DND Button -->
+                <button class="header-btn focus-shield-btn" id="focusShieldToggle" title="Focus Shield / Do Not Disturb Mode">
+                    <span class="shield-icon">🛡️</span>
+                    <span class="shield-text">Focus Shield</span>
+                    <span class="shield-badge" id="shieldBadge">OFF</span>
+                </button>
+                <!-- Theme Toggle -->
+                <button class="header-btn icon-btn" id="themeToggle" title="Toggle Dark/Light Mode">🌙</button>
+                <!-- Logout Button -->
+                <button class="header-btn logout-btn" onclick="logout()" title="Sign Out">🚪 Logout</button>
+            </div>
+        </header>
+
+        <!-- Focus Shield Active Notification Banner -->
+        <div id="focusBanner" class="focus-banner" style="display: none;">
+            <div class="focus-banner-content">
+                <span class="focus-pulse-dot"></span>
+                <span><strong>🛡️ Focus Shield Active:</strong> Screen stay-awake enabled & in-app alerts silenced. Deep work in progress!</span>
+            </div>
+            <button class="focus-banner-close" id="disableFocusBannerBtn">Deactivate</button>
+        </div>
+
+        <!-- HCI Segmented Navigation Tabs -->
+        <nav class="nav-tabs-container">
+            <div class="nav-tabs" role="tablist">
+                <button class="nav-tab active" data-tab="habits" role="tab" aria-selected="true">
+                    <span class="tab-icon">📊</span>
+                    <span class="tab-label">Habits & Streaks</span>
+                </button>
+                <button class="nav-tab" data-tab="tasks" role="tab" aria-selected="false">
+                    <span class="tab-icon">📋</span>
+                    <span class="tab-label">Task Master</span>
+                    <span class="tab-badge" id="taskPendingBadge">0</span>
+                </button>
+                <button class="nav-tab" data-tab="pomodoro" role="tab" aria-selected="false">
+                    <span class="tab-icon">⏱️</span>
+                    <span class="tab-label">Pomodoro Studio</span>
+                </button>
+                <button class="nav-tab" data-tab="zen" role="tab" aria-selected="false">
+                    <span class="tab-icon">🧘</span>
+                    <span class="tab-label">Zen Flow Space</span>
+                </button>
+                <button class="nav-tab" data-tab="coach" role="tab" aria-selected="false">
+                    <span class="tab-icon">🤖</span>
+                    <span class="tab-label">AI Coach</span>
+                </button>
+                <button class="nav-tab" data-tab="analytics" role="tab" aria-selected="false">
+                    <span class="tab-icon">📅</span>
+                    <span class="tab-label">Calendar & Reports</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- MAIN WORKSPACE CONTENT -->
+        <main class="workspace-main">
             
-            <div class="card">
-                <h2>📈 Dashboard</h2>
-                <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-value" id="totalHabits">0</div><div class="stat-label">Total Habits</div></div>
-                    <div class="stat-card"><div class="stat-value" id="totalCompletions">0</div><div class="stat-label">Total Completions</div></div>
-                    <div class="stat-card"><div class="stat-value" id="todayProgress">0/0</div><div class="stat-label">Today's Progress</div></div>
-                    <div class="stat-card"><div class="stat-value" id="bestStreak">0</div><div class="stat-label">🔥 Best Streak</div></div>
+            <!-- TAB 1: HABITS & STREAKS -->
+            <section id="tab-habits" class="tab-content active">
+                <div class="dashboard-grid">
+                    <!-- Left: Habits Management -->
+                    <div class="card habit-card">
+                        <div class="card-header">
+                            <h2>✨ My Daily Habits</h2>
+                            <span class="card-subtitle">Consistency builds greatness</span>
+                        </div>
+                        <div class="add-habit-form">
+                            <input type="text" id="habitName" placeholder="e.g., Exercise, Read 20 mins, Meditate..." />
+                            <button id="addHabitBtn" class="btn-primary">➕ Add Habit</button>
+                        </div>
+                        <div id="habitsList" class="habits-list">
+                            <div class="empty-state">
+                                <div class="empty-icon">🌱</div>
+                                <p>No habits yet. Add your first habit above to begin your transformation!</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right: Habits Dashboard & Charts -->
+                    <div class="card dashboard-summary-card">
+                        <div class="card-header">
+                            <h2>📈 Habit Analytics</h2>
+                            <span class="card-subtitle">Real-time performance metrics</span>
+                        </div>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">🎯</div>
+                                <div class="stat-value" id="totalHabits">0</div>
+                                <div class="stat-label">Total Habits</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">✅</div>
+                                <div class="stat-value" id="totalCompletions">0</div>
+                                <div class="stat-label">Completions</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">📅</div>
+                                <div class="stat-value" id="todayProgress">0/0</div>
+                                <div class="stat-label">Today's Progress</div>
+                            </div>
+                            <div class="stat-card streak-stat">
+                                <div class="stat-icon">🔥</div>
+                                <div class="stat-value" id="bestStreak">0</div>
+                                <div class="stat-label">Best Streak</div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-section">
+                            <div class="progress-meta">
+                                <span>Daily Target Completion</span>
+                                <span id="progressPercentLabel">0%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="chart-container-box">
+                            <h3>📊 Weekly Habit Trajectory</h3>
+                            <div class="canvas-wrapper">
+                                <canvas id="completionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="progress-bar"><div class="progress-fill" id="progressFill">0%</div></div>
-                <div style="margin-top: 25px;"><h3 style="margin-bottom: 15px;">📊 Weekly Progress</h3><div style="height: 250px;"><canvas id="completionChart"></canvas></div></div>
-                <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid var(--border);">
-                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                        <input type="checkbox" id="reminderToggle" style="width: 18px; height: 18px;">
-                        <span>🔔 Enable daily reminder (8 PM)</span>
-                    </label>
+            </section>
+
+            <!-- TAB 2: TASK MASTER (DAILY TASK MANAGEMENT) -->
+            <section id="tab-tasks" class="tab-content">
+                <div class="tasks-workspace">
+                    <!-- Task Input & Controls Card -->
+                    <div class="card task-creator-card">
+                        <div class="card-header">
+                            <div class="title-with-badge">
+                                <h2>📋 Daily Task Master</h2>
+                                <span class="badge-pill" id="taskHeaderStats">0 Active Tasks</span>
+                            </div>
+                            <p class="card-subtitle">Prioritize, conquer, and celebrate daily victories</p>
+                        </div>
+
+                        <form id="addTaskForm" class="task-form-grid">
+                            <div class="input-with-icon">
+                                <span class="input-icon">✏️</span>
+                                <input type="text" id="taskTitleInput" placeholder="What is your most important task right now?" required />
+                            </div>
+                            <div class="priority-selector">
+                                <label class="priority-label">Priority:</label>
+                                <div class="priority-pills">
+                                    <label class="priority-radio high">
+                                        <input type="radio" name="taskPriority" value="high" />
+                                        <span>🔴 High</span>
+                                    </label>
+                                    <label class="priority-radio medium">
+                                        <input type="radio" name="taskPriority" value="medium" checked />
+                                        <span>🟡 Medium</span>
+                                    </label>
+                                    <label class="priority-radio low">
+                                        <input type="radio" name="taskPriority" value="low" />
+                                        <span>🟢 Low</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <button type="submit" id="submitTaskBtn" class="btn-primary">➕ Add Task</button>
+                        </form>
+                    </div>
+
+                    <!-- Tasks Filter & List Card -->
+                    <div class="card task-list-card">
+                        <div class="task-toolbar">
+                            <div class="filter-pills" id="taskFilterGroup">
+                                <button class="filter-pill active" data-filter="all">All (<span id="countAllTasks">0</span>)</button>
+                                <button class="filter-pill" data-filter="active">Active (<span id="countActiveTasks">0</span>)</button>
+                                <button class="filter-pill priority-high-filter" data-filter="high">🔴 High Priority (<span id="countHighTasks">0</span>)</button>
+                                <button class="filter-pill" data-filter="completed">✅ Completed (<span id="countCompletedTasks">0</span>)</button>
+                            </div>
+                            <button class="clear-completed-btn" id="clearCompletedTasksBtn" title="Clear all finished tasks">🧹 Clear Finished</button>
+                        </div>
+
+                        <!-- All Done Victory Card -->
+                        <div id="allTasksDoneBanner" class="victory-banner" style="display: none;">
+                            <div class="victory-icon">🏆✨</div>
+                            <div class="victory-text">
+                                <h3>Outstanding Work! All Tasks Complete!</h3>
+                                <p>You conquered today's mission. Take a break or recharge with Zen Flow.</p>
+                            </div>
+                        </div>
+
+                        <!-- Task Items Container -->
+                        <div id="tasksList" class="tasks-list">
+                            <div class="empty-state">
+                                <div class="empty-icon">📝</div>
+                                <p>No tasks added for today. Capture a new task above!</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <button class="export-btn" id="exportBtn" style="margin-top: 15px;">💾 Export Data (JSON)</button>
-                <button class="export-btn" id="exportPDFBtn" style="margin-top: 10px; background: linear-gradient(135deg, #ef476f, #c1121f);">📄 Export as PDF</button>
-            </div>
-        </div>
-        
-        <!-- AI Coach Section -->
-        <div class="card coach-card">
-            <div class="coach-header">
-                <div class="coach-avatar">🤖</div>
-                <div class="coach-title">
-                    <h2>AI Habit Coach</h2>
-                    <p>Your personal habit assistant, ready to help 24/7</p>
+            </section>
+
+            <!-- TAB 3: POMODORO STUDIO -->
+            <section id="tab-pomodoro" class="tab-content">
+                <div class="pomodoro-workspace">
+                    <div class="card pomodoro-card">
+                        <!-- Mode Selector -->
+                        <div class="pomodoro-modes">
+                            <button class="pomo-mode-btn active" data-mode="focus" data-time="25">🎯 Focus (25m)</button>
+                            <button class="pomo-mode-btn" data-mode="shortBreak" data-time="5">☕ Short Break (5m)</button>
+                            <button class="pomo-mode-btn" data-mode="longBreak" data-time="15">🌴 Long Break (15m)</button>
+                        </div>
+
+                        <!-- Linked Task Banner -->
+                        <div class="pomo-task-link">
+                            <span class="pomo-task-icon">🎯</span>
+                            <span class="pomo-task-text" id="pomoLinkedTaskTitle">Working on: General Deep Focus</span>
+                            <button class="btn-link-sm" id="pomoChangeTaskBtn">Change Task</button>
+                        </div>
+
+                        <!-- Circular SVG Timer Ring -->
+                        <div class="pomo-timer-display">
+                            <svg class="pomo-ring-svg" viewBox="0 0 280 280">
+                                <circle class="pomo-ring-bg" cx="140" cy="140" r="120"></circle>
+                                <circle class="pomo-ring-progress" id="pomoProgressRing" cx="140" cy="140" r="120"></circle>
+                            </svg>
+                            <div class="pomo-timer-text-overlay">
+                                <div class="pomo-time" id="pomoTimeDisplay">25:00</div>
+                                <div class="pomo-status-label" id="pomoStatusLabel">Ready to Focus</div>
+                            </div>
+                        </div>
+
+                        <!-- Controls -->
+                        <div class="pomo-controls">
+                            <button class="pomo-btn-main" id="pomoPlayPauseBtn">
+                                <span id="pomoPlayIcon">▶</span>
+                                <span id="pomoPlayText">Start Session</span>
+                            </button>
+                            <button class="pomo-btn-sub" id="pomoResetBtn" title="Reset Timer">🔄 Reset</button>
+                            <button class="pomo-btn-sub" id="pomoSkipBtn" title="Skip to Next Phase">⏭ Skip</button>
+                        </div>
+
+                        <!-- Pomodoro Stats & Cycle -->
+                        <div class="pomo-stats-row">
+                            <div class="pomo-stat-item">
+                                <span class="pomo-stat-val" id="pomoCompletedCount">0</span>
+                                <span class="pomo-stat-lbl">🍅 Sessions Today</span>
+                            </div>
+                            <div class="pomo-stat-item">
+                                <span class="pomo-stat-val" id="pomoTotalMinutes">0m</span>
+                                <span class="pomo-stat-lbl">⚡ Focus Time</span>
+                            </div>
+                            <div class="pomo-stat-item">
+                                <span class="pomo-stat-val" id="pomoCycleIndicator">⚪⚪⚪⚪</span>
+                                <span class="pomo-stat-lbl">4-Pomo Cycle</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div id="coachMessages" class="coach-chat-container">
-                <div class="coach-welcome">
-                    <div class="coach-welcome-emoji">🧠✨</div>
-                    <h3>Hi there! I'm your AI Habit Coach</h3>
-                    <p>Ask me anything about building better habits, staying motivated, or getting back on track.</p>
+            </section>
+
+            <!-- TAB 4: ZEN FLOW SPACE -->
+            <section id="tab-zen" class="tab-content">
+                <div class="zen-workspace-grid">
+                    <!-- 4-7-8 Breathing Guide Card -->
+                    <div class="card zen-card breathing-card">
+                        <div class="card-header">
+                            <h2>🫁 4-7-8 Calming Breathing</h2>
+                            <p class="card-subtitle">Scientifically proven to dissolve cognitive stress and restore laser focus</p>
+                        </div>
+                        
+                        <div class="breathing-stage">
+                            <div class="breathing-orb-container">
+                                <div class="breathing-orb" id="breathingOrb">
+                                    <div class="breathing-inner-orb">
+                                        <span class="breathing-action" id="breathingActionText">Ready</span>
+                                        <span class="breathing-countdown" id="breathingCountdown">4s</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="breathing-phase-guide">
+                                <div class="phase-step active" id="phaseInhale">1. Inhale (4s)</div>
+                                <div class="phase-step" id="phaseHold">2. Hold (7s)</div>
+                                <div class="phase-step" id="phaseExhale">3. Exhale (8s)</div>
+                            </div>
+                        </div>
+
+                        <div class="breathing-controls">
+                            <button class="btn-primary" id="startBreathingBtn">▶ Begin Breathing Cycle</button>
+                            <button class="btn-secondary" id="stopBreathingBtn" style="display: none;">⏹ End Exercise</button>
+                        </div>
+                    </div>
+
+                    <!-- Web Audio Generative Soundscapes Card -->
+                    <div class="card zen-card soundscape-card">
+                        <div class="card-header">
+                            <div class="title-with-badge">
+                                <h2>🎧 Mindflow Soundscapes</h2>
+                                <span class="badge-pill sound-badge">Synthesized Audio</span>
+                            </div>
+                            <p class="card-subtitle">Zero external audio files — generated live in real-time</p>
+                        </div>
+
+                        <div class="soundscape-mixer">
+                            <!-- Rain Sound -->
+                            <div class="sound-track" data-sound="rain">
+                                <div class="sound-info">
+                                    <span class="sound-icon">🌧️</span>
+                                    <div>
+                                        <div class="sound-name">Cozy Rain</div>
+                                        <div class="sound-desc">Gentle rainfall pink-noise</div>
+                                    </div>
+                                </div>
+                                <div class="sound-controls">
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="0.5" disabled />
+                                    <button class="sound-toggle-btn" data-sound="rain">Play</button>
+                                </div>
+                            </div>
+
+                            <!-- Ocean Waves -->
+                            <div class="sound-track" data-sound="waves">
+                                <div class="sound-info">
+                                    <span class="sound-icon">🌊</span>
+                                    <div>
+                                        <div class="sound-name">Ocean Surf</div>
+                                        <div class="sound-desc">Rhythmic ocean tide modulation</div>
+                                    </div>
+                                </div>
+                                <div class="sound-controls">
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="0.5" disabled />
+                                    <button class="sound-toggle-btn" data-sound="waves">Play</button>
+                                </div>
+                            </div>
+
+                            <!-- 40Hz Gamma Flow -->
+                            <div class="sound-track" data-sound="binaural">
+                                <div class="sound-info">
+                                    <span class="sound-icon">🧠</span>
+                                    <div>
+                                        <div class="sound-name">40Hz Gamma Flow</div>
+                                        <div class="sound-desc">Cognitive focus binaural frequency</div>
+                                    </div>
+                                </div>
+                                <div class="sound-controls">
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="0.4" disabled />
+                                    <button class="sound-toggle-btn" data-sound="binaural">Play</button>
+                                </div>
+                            </div>
+
+                            <!-- Forest Breeze -->
+                            <div class="sound-track" data-sound="forest">
+                                <div class="sound-info">
+                                    <span class="sound-icon">🍃</span>
+                                    <div>
+                                        <div class="sound-name">Forest Wind</div>
+                                        <div class="sound-desc">Soft ambient woodland breeze</div>
+                                    </div>
+                                </div>
+                                <div class="sound-controls">
+                                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="0.5" disabled />
+                                    <button class="sound-toggle-btn" data-sound="forest">Play</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="soundscape-footer">
+                            <button class="btn-secondary" id="stopAllAudioBtn">🔇 Mute All Soundscapes</button>
+                            <button class="btn-zen-fullscreen" id="fullscreenZenBtn">⛶ Fullscreen Focus Mode</button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="coach-input-area">
-                <input type="text" id="coachInput" placeholder="Ask me anything about habits... 💬" />
-                <button id="sendCoachBtn">📤 Send</button>
-            </div>
-            <div class="coach-quick-actions">
-                <button class="coach-quick-btn" data-type="motivation">🔥 Motivation</button>
-                <button class="coach-quick-btn" data-type="suggestion">💡 Habit Idea</button>
-                <button class="coach-quick-btn" data-type="explain">📚 Why It Works</button>
-                <button class="coach-quick-btn" data-type="recovery">🔄 Get Back on Track</button>
-            </div>
-        </div>
-        
-        <!-- Calendar Section -->
-        <div class="card">
-            <h2>📅 Activity Calendar</h2>
-            <div class="calendar">
-                <div class="calendar-header">
-                    <button class="calendar-nav" id="prevMonth">◀</button>
-                    <span id="currentMonth"></span>
-                    <button class="calendar-nav" id="nextMonth">▶</button>
+            </section>
+
+            <!-- TAB 5: AI HABIT COACH -->
+            <section id="tab-coach" class="tab-content">
+                <div class="card coach-card">
+                    <div class="coach-header">
+                        <div class="coach-avatar">🤖</div>
+                        <div class="coach-title">
+                            <h2>AI Habit & Flow Coach</h2>
+                            <p>Science-backed coaching & motivation available 24/7</p>
+                        </div>
+                    </div>
+                    <div id="coachMessages" class="coach-chat-container">
+                        <div class="coach-welcome">
+                            <div class="coach-welcome-emoji">🧠✨</div>
+                            <h3>Hi there! I'm your AI Habit & Productivity Coach</h3>
+                            <p>Ask me anything about building routines, conquering procrastination, or structuring your Pomodoro sessions.</p>
+                        </div>
+                    </div>
+                    <div class="coach-input-area">
+                        <input type="text" id="coachInput" placeholder="Ask for advice, habit ideas, or motivation... 💬" />
+                        <button id="sendCoachBtn" class="btn-primary">📤 Send</button>
+                    </div>
+                    <div class="coach-quick-actions">
+                        <button class="coach-quick-btn" data-type="motivation">🔥 Need Quick Motivation</button>
+                        <button class="coach-quick-btn" data-type="suggestion">💡 Suggest a 2-Min Habit</button>
+                        <button class="coach-quick-btn" data-type="explain">📚 Why Habits Fail & How to Fix</button>
+                        <button class="coach-quick-btn" data-type="recovery">🔄 Restarting After a Missed Day</button>
+                    </div>
                 </div>
-                <div class="calendar-grid" id="calendarGrid"></div>
-            </div>
-            <p style="text-align: center; margin-top: 15px; color: var(--text-secondary); font-size: 0.85rem;">💡 Click on any day to see details</p>
-        </div>
+            </section>
+
+            <!-- TAB 6: CALENDAR & REPORTS -->
+            <section id="tab-analytics" class="tab-content">
+                <div class="analytics-grid">
+                    <!-- Activity Calendar -->
+                    <div class="card calendar-card">
+                        <div class="card-header">
+                            <h2>📅 Activity Heatmap Calendar</h2>
+                            <p class="card-subtitle">Your consistency map across the month</p>
+                        </div>
+                        <div class="calendar">
+                            <div class="calendar-header">
+                                <button class="calendar-nav" id="prevMonth">◀</button>
+                                <span id="currentMonth" class="month-title"></span>
+                                <button class="calendar-nav" id="nextMonth">▶</button>
+                            </div>
+                            <div class="calendar-grid" id="calendarGrid"></div>
+                        </div>
+                        <p class="calendar-hint">💡 Click any date tile to inspect completed items</p>
+                    </div>
+
+                    <!-- Export & Settings -->
+                    <div class="card export-card">
+                        <div class="card-header">
+                            <h2>💾 Data Integrity & Export</h2>
+                            <p class="card-subtitle">Keep backup copies or generate accountability reports</p>
+                        </div>
+                        <div class="reminder-toggle-box">
+                            <label class="toggle-switch-label">
+                                <input type="checkbox" id="reminderToggle" />
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">🔔 Daily Habit Reminder (8:00 PM)</span>
+                            </label>
+                        </div>
+                        <div class="export-actions">
+                            <button class="export-btn btn-json" id="exportBtn">💾 Export Complete Data (JSON)</button>
+                            <button class="export-btn btn-pdf" id="exportPDFBtn">📄 Download Progress Report (PDF)</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
     </div>
-    
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
